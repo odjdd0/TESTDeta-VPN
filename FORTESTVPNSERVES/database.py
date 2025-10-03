@@ -156,4 +156,25 @@ def get_all_user_ids():
         return users
     except sqlite3.Error as e:
         logging.error(f"Ошибка получения списка пользователей: {e}")
+
         return []
+
+def get_all_users():
+    """Получение всех данных пользователей из базы данных."""
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        c = conn.cursor()
+        c.execute("SELECT user_id, internal_id, username, registration_date FROM users")
+        users = [
+            {
+                "tg_id": row[0],
+                "vpn_id": row[1],
+                "username": row[2],
+                "registered_at": row[3]
+            } for row in c.fetchall()
+        ]
+        conn.close()
+        return users
+    except sqlite3.Error as e:
+        logging.error(f"Ошибка получения данных пользователей: {e}")
+        return None
