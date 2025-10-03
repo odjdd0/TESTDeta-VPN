@@ -154,6 +154,36 @@ def register_handlers(dp: Dispatcher):
         await callback_query.message.answer(response)
         await callback_query.answer()
 
+    @dp.callback_query_handler(text="download_db")
+    async def download_db(callback_query: types.CallbackQuery):
+        user_id = callback_query.from_user.id
+        if not is_admin(user_id):
+            await callback_query.message.answer("У вас нет доступа.")
+            return
+
+        users = get_all_users()  # Предполагаем, что функция возвращает список словарей: [{'tg_id': int, 'vpn_id': str, 'username': str, 'registered_at': datetime}, ...]
+        if users is None:
+            await callback_query.message.answer("Ошибка базы данных. Попробуйте позже.")
+            return
+
+        # Создаем CSV в памяти
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['TG ID', 'VPN ID', 'Username', 'Registered At'])  # Заголовки
+
+        for user in users:
+            writer.writerow([user['tg_id'], user['vpn_id'], user['username'], user['registered_at']])
+
+        output.seek(0)
+        file = types.InputFile(output, filename="users_db.csv")
+
+        await callback_query.message.bot.send_document(
+            chat_id=callback_query.message.chat.id,
+            document=file,
+            caption="Выкачанная база данных пользователей (CSV)"
+        )
+        await callback_query.answer()
+
     @dp.callback_query_handler(text="set_config")
     async def set_config_prompt(callback_query: types.CallbackQuery, state: FSMContext):
         user_id = callback_query.from_user.id
@@ -294,4 +324,5 @@ def register_handlers(dp: Dispatcher):
             await callback_query.answer("Сообщение удалено.")
         except Exception as e:
             logging.error(f"Ошибка удаления сообщения: {e}")
+
             await callback_query.answer("Не удалось удалить сообщение.")
