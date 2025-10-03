@@ -18,8 +18,9 @@ def get_admin_panel():
     keyboard = InlineKeyboardMarkup(row_width=1)
     keyboard.add(
         InlineKeyboardButton("БД пользователей", callback_data="view_users"),
+        InlineKeyboardButton("Выкачать БД", callback_data="download_db"),
         InlineKeyboardButton("Изменить конфиг", callback_data="set_config"),
-        InlineKeyboardButton("Отправить рассылку", callback_data="broadcast")
+        InlineKeyboardButton("Отправить рассылку", callback_data="broadcast") 
     )
     return keyboard
 
@@ -35,4 +36,5 @@ def get_broadcast_keyboard(url=None):
     if url:
         keyboard.add(InlineKeyboardButton("♻️Перейти♻️", url=url))
     keyboard.add(InlineKeyboardButton("❌Удалить сообщение❌", callback_data="delete_broadcast"))
+
     return keyboard
