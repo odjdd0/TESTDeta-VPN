@@ -1,9 +1,0 @@
-TESTBOT
-├── RAB.py
-├── config.py
-├── database.py
-├── keyboards.py
-├── handlers.py
-├── states.py
-├── users.db
-├── requirements.txt
